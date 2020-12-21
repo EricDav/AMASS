@@ -1,0 +1,19 @@
+{
+    "autoload": {
+        "psr-4": {
+            "AMASS\\": "src/"
+        }
+    },
+    "name": "vendor/amas",
+    "description": "Basic API config",
+    "type": "project",
+    "authors": [
+        {
+            "name": "David Alienyi",
+            "email": "alienyidavid4christ@gmail.com"
+        }
+    ],
+    "require": {
+        "nesbot/carbon": "^2.37"
+    }
+}
