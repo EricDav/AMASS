@@ -15,11 +15,11 @@
                 'user' => 'ammasng_amass',
                 'password' => 'weareamass123',
                 'host' => 'localhost',
-                'database' => 'ammassng_dev',
+                'database' => 'ammasng_dev',
                 'port' => 8889
             ),
             'production' => array(
-                
+
             )
         );
     }
