@@ -1,7 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "AMASS\\": "src/"
+            "amass\\": "src/"
         }
     },
     "name": "vendor/amas",

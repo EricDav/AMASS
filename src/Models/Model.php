@@ -40,7 +40,6 @@
                 $clauseData = self::generateInsertClause($params);
                 $sql = 'INSERT INTO ' . $tableName . ' ' . $clauseData['attributes']  . ' VALUES' . $clauseData['values'];
 
-                var_dump($sql); exit;
                 $stmt= $dbConnection->pdo->prepare($sql);
                 $stmt->execute($clauseData['params']);
                 if(in_array($tableName, self::DISALLOWED_LAST_ID_TABLES)) {
