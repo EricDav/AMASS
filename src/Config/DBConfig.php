@@ -11,12 +11,15 @@
                 'port' => 8889
             ),
     
-            'production' => array(
+            'staging' => array(
                 'user' => 'ammasng_amass',
                 'password' => 'weareamass123',
                 'host' => 'localhost',
                 'database' => 'ammassng_dev',
                 'port' => 8889
+            ),
+            'production' => array(
+                
             )
         );
     }
