@@ -7,6 +7,7 @@ class AMASS {
         'POST' => array(
             BASE_URL . '/users' => 'User@create',
             BASE_URL . '/login' => 'User@login',
+            BASE_URL . '/verify' => 'User@initiate',
         ),
 
         'GET' => array(
@@ -15,8 +16,9 @@ class AMASS {
 
     const ALLOWED_PARAM = [
         'POST' => array( 
-            BASE_URL . '/users' => ['name', 'email', 'phone_number', 'password', 'role'],
+            BASE_URL . '/users' => ['name', 'email', 'phone_number', 'password', 'token'],
             BASE_URL . '/login' => ['password', 'username'],
+            BASE_URL . '/verify' => ['email', 'phone_number'],
         ),
         'GET' => array(
 

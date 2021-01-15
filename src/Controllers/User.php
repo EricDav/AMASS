@@ -4,11 +4,49 @@
     use AMASS\Helpers\Helper;
     use AMASS\Helpers\JWT;
     use AMASS\Models\Model;
+    use AMASS\SendMail;
 
     class User extends Controller {
         const EXP_IN_SEC = 18000;
         public function __construct() {
             parent::__construct();
+        }
+
+        public function initiate($request) {
+            $email = $request->body->email;
+            $isValidEmail = Helper::isValidEmail($request->body->email);
+            if (!$isValidEmail['isValid']) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'Invalid email address'));
+            }
+
+            if (strlen($request->body->phone_number) != 11 || !is_numeric($request->body->phone_number)) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'Invalid phone number'));
+            }
+
+            $this->dbConnection->open();
+            $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
+
+            if ($user) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'User with this email already exist'));
+            } else {
+                $user = Model::findOne($this->dbConnection, array('phone_number' => $request->body->phone_number), 'users');
+                if ($user) {
+                    $this->jsonResponse(array('success' => '11', 'message' => 'User with this phone number already exist'));
+                }
+            }
+            $yourCode = Helper::generatePin();
+
+            $userId = Model::create(
+                $this->dbConnection,
+                array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number),
+                'users'
+            );
+
+            $message = "<h3>Your verification code: " . $yourCode . "</div>";
+            $mail = new SendMail($email, "Account Verification", $message, true);
+            $mail->send();
+            $this->jsonResponse(array('success' => '00', 'message' => 'Check your email address for the verification code and enter it below'));
+
         }
 
         public function create($request) {
@@ -17,35 +55,32 @@
             if ($errorMessages == null) {
                 $passwordHash = password_hash($request->body->password, PASSWORD_DEFAULT);
                 $userDetails = array(
-                    'email' => $request->body->email,
                     'name' => $request->body->name,
-                    'phone_number' => $request->body->phone_number,
-                    'role' => $request->body->role,
+                    'is_verified' => 1,
                     'password' => $passwordHash
                 );
 
-                $userId = Model::create(
+                $userId = Model::update(
                     $this->dbConnection,
                     $userDetails,
+                    array('email' => $request->body->email),
                     'users'
                 );
 
                 if ($userId) {
-                    // Add to students if role is 1
                     $user = array(
                         'id' => $userId,
-                        'role' => $request->body->role,
                         'email' => $request->body->email,
                         'phone_number' => $request->body->phone_number,
-                        'name' => $request->body->first_name,
+                        'name' => $request->body->name,
                     );
                     $jwt = JWT::generateJWT(json_encode(['email' => $request->body->email, 'name' => $request->body->name, 'id' => $userId, 'exp' => (time()) + User::EXP_IN_SEC]));
-                    $this->jsonResponse(array('success' => '11', 'message' => 'User created successfully', 'token' => $jwt, 'user' => $user, 'exp' => User::EXP_IN_SEC), Controller::HTTP_OKAY_CODE);
+                    $this->jsonResponse(array('success' => '00', 'message' => 'User created successfully', 'token' => $jwt, 'user' => $user, 'exp' => User::EXP_IN_SEC), Controller::HTTP_OKAY_CODE);
                 }
 
-                $this->jsonResponse(array('success' => '00', 'message' => 'Server error'));
+                $this->jsonResponse(array('success' => '11', 'message' => 'Server error'));
             } else {
-                $this->jsonResponse(array('success' => '00', 'message' => $errorMessages));
+                $this->jsonResponse(array('success' => '11', 'message' => $errorMessages));
             }
         }
 
@@ -72,20 +107,19 @@
                 return'Invalid phone number';
             }
 
-            if ($request->body->role != 0 && $request->body->role != 1) {
-                return 'Invalid role';
-            }
 
-            if (sizeof($errorMessages) == 0) {
+            if (!$errorMessages) {
                 $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
+                if ($user['is_verified']) {
+                    return 'User already created and verified';
+                }
 
-                if ($user) {
-                    return 'User with this email already exist';
-                } else {
-                    $user = Model::findOne($this->dbConnection, array('phone_number' => $request->body->phone_number), 'users');
-                    if ($user) {
-                        return 'User with this phone number already exist';
-                    }
+                if ($user['token'] != $request->body->token) {
+                    return 'Invalid token';
+                }
+
+                if ($user['phone_number'] != $request->body->phone_number) {
+                    return 'Phone number does not match';
                 }
 
             }

@@ -33,5 +33,16 @@
                 return Array("isValid" => false, "message" => 'Email address is invalid');
             }
         }
+        
+        public static function generatePin() {
+            $pins = '';
+            $tmp = mt_rand(1,9);
+            $j = 0;
+            do {
+                $tmp .= mt_rand(0, 9);
+            } while(++$j < 6);
+                
+            return $tmp;
+        }
     }
 ?>
