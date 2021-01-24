@@ -38,7 +38,7 @@
 
             $userId = Model::create(
                 $this->dbConnection,
-                array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number),
+                array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number, 'name' => $request->body->name),
                 'users'
             );
 
@@ -55,7 +55,6 @@
             if ($errorMessages == null) {
                 $passwordHash = password_hash($request->body->password, PASSWORD_DEFAULT);
                 $userDetails = array(
-                    'name' => $request->body->name,
                     'is_verified' => 1,
                     'password' => $passwordHash
                 );
