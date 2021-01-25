@@ -88,17 +88,10 @@
 
         public function validateCreate($request) {
             $errorMessages = null;
-            $name = $request->body->name;
-
-            $isValidName = Helper::isValidName($name);
             $isValidEmail = Helper::isValidEmail($request->body->email);
 
             if (!$isValidEmail['isValid']) {
                 return $isValidEmail['message'];
-            }
-
-            if (!$isValidName['isValid']) {
-                return $isValidName['message'];
             }
 
             if (!trim($request->body->password)) {
