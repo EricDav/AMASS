@@ -26,21 +26,24 @@
             $this->dbConnection->open();
             $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
 
-            if ($user) {
+            if ($user && $user['email'] != $email) {
                 $this->jsonResponse(array('success' => '11', 'message' => 'User with this email already exist'));
             } else {
                 $user = Model::findOne($this->dbConnection, array('phone_number' => $request->body->phone_number), 'users');
-                if ($user) {
+                if ($user && $user['phone_number'] != $phoneNumber) {
                     $this->jsonResponse(array('success' => '11', 'message' => 'User with this phone number already exist'));
                 }
             }
             $yourCode = Helper::generatePin();
 
-            $userId = Model::create(
-                $this->dbConnection,
-                array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number, 'name' => $request->body->name),
-                'users'
-            );
+            
+            if (!$user) {
+                $userId = Model::create(
+                    $this->dbConnection,
+                    array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number, 'name' => $request->body->name),
+                    'users'
+                );
+            }
 
             $message = "<h3>Your verification code: " . $yourCode . "</div>";
             $mail = new SendMail($email, "Account Verification", $message, true);
