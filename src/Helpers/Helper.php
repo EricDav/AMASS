@@ -40,7 +40,7 @@
             $j = 0;
             do {
                 $tmp .= mt_rand(0, 9);
-            } while(++$j < 6);
+            } while(++$j < 4);
                 
             return $tmp;
         }
