@@ -45,7 +45,7 @@
                 );
             }
 
-            $message = "<h3>Your verification code: " . $yourCode . "</div>";
+            $message = "<h3>Your verification code: " . $yourCode . "</h3>";
             $mail = new SendMail($email, "Account Verification", $message, true);
             $mail->send();
             $this->jsonResponse(array('success' => '00', 'message' => 'Check your email address for the verification code and enter it below'));

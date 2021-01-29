@@ -87,7 +87,6 @@
                 return true;
             } catch (Exception $e) {
                 echo $e->getMessage();
-                echo "Error while sending mail"; exit;
                 mail("alienyidavid4christ@gmail.com","Mail Failure","Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}");
                 // echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
                 return false;
