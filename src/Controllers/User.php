@@ -23,15 +23,23 @@
                 $this->jsonResponse(array('success' => '11', 'message' => 'Invalid phone number'));
             }
 
+            // Checks if user with this email has been verified
+            $userE = Model::findOne($this->dbConnection, array('email' => $request->body->email, 'is_verified' => 1), 'users');
+            if ($userE) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'User with this email already exist'));
+            }
+
+            // Checks if user with this phone number has been verified
+            $userP = Model::findOne($this->dbConnection, array('phone_number' => $request->body->phone_number, 'is_verified' => 1), 'users');
+            if ($userP) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'User with this phone number already exist'));
+            }
+
             $this->dbConnection->open();
             $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
             $yourCode = Helper::generatePin();
             
             if (!$user) {
-                $userP = Model::findOne($this->dbConnection, array('phone_number' => $request->body->phone_number), 'users');
-                if ($userP && $userP['phone_number'] != $phoneNumber) {
-                    $this->jsonResponse(array('success' => '11', 'message' => 'User with this phone number already exist'));
-                }
                 $userId = Model::create(
                     $this->dbConnection,
                     array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number, 'name' => $request->body->name),
