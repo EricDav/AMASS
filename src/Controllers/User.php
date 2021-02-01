@@ -23,6 +23,8 @@
                 $this->jsonResponse(array('success' => '11', 'message' => 'Invalid phone number'));
             }
 
+
+            $this->dbConnection->open();
             // Checks if user with this email has been verified
             $userE = Model::findOne($this->dbConnection, array('email' => $request->body->email, 'is_verified' => 1), 'users');
             if ($userE) {
@@ -35,7 +37,6 @@
                 $this->jsonResponse(array('success' => '11', 'message' => 'User with this phone number already exist'));
             }
 
-            $this->dbConnection->open();
             $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
             $yourCode = Helper::generatePin();
             
@@ -48,7 +49,7 @@
             } else {
                 Model::update(
                     $this->dbConnection,
-                    array('token' => $yourCode, 'is_verified' => 0, 'email' => $email, 'phone_number' => $request->body->phone_number, 'name' => $request->body->name),
+                    array('token' => $yourCode, 'is_verified' => 0,  'name' => $request->body->name),
                     array('id' => $user['id']),
                     'users'
                 );
@@ -58,7 +59,6 @@
             $mail = new SendMail($email, "Account Verification", $message, true);
             $mail->send();
             $this->jsonResponse(array('success' => '00', 'message' => 'Check your email address for the verification code and enter it below'));
-
         }
 
         public function create($request) {
