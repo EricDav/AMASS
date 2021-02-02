@@ -111,7 +111,6 @@
                 return'Invalid phone number';
             }
 
-
             if (!$errorMessages) {
                 $user = Model::findOne($this->dbConnection, array('email' => $request->body->email), 'users');
                 if ($user['is_verified']) {
@@ -135,22 +134,22 @@
             $this->dbConnection->open();
             $errorMessages = $this->validateLogin($request->body->username, $request->body->password);
             if (sizeof($errorMessages['errorMessages']) > 0) {
-                $this->jsonResponse(array('success' => false, 'message' => $errorMessages['errorMessages']), Controller::HTTP_BAD_REQUEST_CODE);
+                $this->jsonResponse(array('success' => '11', 'message' => $errorMessages['errorMessages']), Controller::HTTP_BAD_REQUEST_CODE);
             }
 
             $whichUser = $errorMessages['data'] == 'email' ? 'email' : 'phone_number';
             $user = Model::findOne($this->dbConnection, array($whichUser => $request->body->username), 'users');
             if ($user === 'Server error') {
-                $this->jsonResponse(array('success' => false, 'message' => ['Server error']), Controller::HTTP_SERVER_ERROR_CODE);
+                $this->jsonResponse(array('success' => '11', 'message' => ['Server error']), Controller::HTTP_SERVER_ERROR_CODE);
             }
 
             if (is_array($user) && password_verify($request->body->password, $user['password'])) {
                 $user['password'] = '';
                 $jwt = JWT::generateJWT(json_encode([$user, 'exp' => (time()) + User::EXP_IN_SEC]));
-                $this->jsonResponse(array('success' => true, 'user' => $user, 'message' => 'logged in successfully', 'token' => $jwt, 'exp' =>  User::EXP_IN_SEC));
+                $this->jsonResponse(array('success' => '00', 'user' => $user, 'message' => 'logged in successfully', 'token' => $jwt, 'exp' =>  User::EXP_IN_SEC));
             }
 
-            $this->jsonResponse(array('success' => false, 'message' => 'Invalid username or password'), Controller::HTTP_UNAUTHORIZED_CODE);
+            $this->jsonResponse(array('success' => '11', 'message' => 'Invalid username or password'), Controller::HTTP_UNAUTHORIZED_CODE);
         }
 
         public function validateLogin($username, $password) {
