@@ -6,6 +6,7 @@
     use AMASS\Models\Model;
     use AMASS\SendMail;
     use AMASS\Models\Product AS ProductModel;
+    use AMASS\Enviroment\Enviroment;
 
     class Product extends Controller {
         const EXP_IN_SEC = 18000;
@@ -22,7 +23,6 @@
             $price  = $request->body->price;
             $tokenPayload = JWT::verifyToken($request->body->token);
             $tokenPayload = json_decode($tokenPayload->payload);
-            // var_dump($_FILES); exit;
 
             $uploadOk = true;
             $imageFileType = pathinfo($_FILES['file']['name'],PATHINFO_EXTENSION);
@@ -50,9 +50,17 @@
 
             $newFilename = sha1($productId . $_FILES['file']['name']) . '-' . $productId . '.' . $imageFileType;
             if (move_uploaded_file($_FILES['file']['tmp_name'],  __DIR__ . '/../Public/images/'.$newFilename)) {
+                $env = Enviroment::getEnv();
+                if ($env == 'development') {
+                    $baseUrl = 'http://localhost:8888/amass/src/Public/images/';
+                } else if ($env == 'staging') {
+                    $baseUrl = 'http://staging-api.amass.ng/amass/src/Public/images/';
+                } else {
+                    $baseUrl = 'http://api.amass.ng/amass/src/Public/images/';
+                }
                 Model::update(
                     $this->dbConnection,
-                    array('image_url' => $newFilename),
+                    array('image_url' => $baseUrl . $newFilename),
                     array('id' => $productId),
                     'products'
                 );
