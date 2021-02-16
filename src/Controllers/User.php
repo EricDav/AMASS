@@ -77,13 +77,15 @@
                     array('email' => $request->body->email),
                     'users'
                 );
-
+                $hash = password_hash($request->body->email . $request->body->phone_number, PASSWORD_DEFAULT);
                 if ($userId) {
                     $user = array(
                         'id' => $userId,
                         'email' => $request->body->email,
                         'phone_number' => $request->body->phone_number,
                         'name' => $request->body->name,
+                        'hash' => $hash,
+                        'created_at' => gmdate('Y-m-d\ H:i:s')
                     );
                     $jwt = JWT::generateJWT(json_encode(['email' => $request->body->email, 'name' => $request->body->name, 'id' => $userId, 'exp' => (time()) + User::EXP_IN_SEC]));
                     $this->jsonResponse(array('success' => '00', 'message' => 'User created successfully', 'token' => $jwt, 'user' => $user, 'exp' => User::EXP_IN_SEC), Controller::HTTP_OKAY_CODE);
@@ -145,7 +147,7 @@
 
             if (is_array($user) && password_verify($request->body->password, $user['password'])) {
                 $user['password'] = '';
-                $jwt = JWT::generateJWT(json_encode([$user, 'exp' => (time()) + User::EXP_IN_SEC]));
+                $jwt = JWT::generateJWT(json_encode(['user' => $user, 'exp' => (time()) + User::EXP_IN_SEC]));
                 $this->jsonResponse(array('success' => '00', 'user' => $user, 'message' => 'logged in successfully', 'token' => $jwt, 'exp' =>  User::EXP_IN_SEC));
             }
 
@@ -282,6 +284,57 @@
 
             $this->jsonResponse(array('success' => false, 'message' => 'Old password not correct'), 400);
 
+        }
+
+        public function getUser($request) {
+            $userId = $request->query->user_id;
+            if (!is_numeric($userId)) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'user id must be numeric'));
+            }
+
+            $this->dbConnection->open();
+            $user = Model::findOne(
+                $this->dbConnection,
+                array('id' => $userId),
+                'users'
+            );
+
+            unset($user['hash']);
+            if ($user) {
+                $this->jsonResponse(array('success' => '00', 'data' => $user));
+            }
+
+            $this->jsonResponse(array('success' => '11', 'message' => 'Server error', 'data' => array()));
+        }
+
+        public function bookAppointment($request) {
+            $productId = $request->body->product_id;
+            $hash = $request->body->hash;
+
+            if (!is_numeric($productId)) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'Product id must be numeric'));
+            }
+            $this->dbConnection->open();
+            $user = Model::findOne($this->dbConnection, array('hash' => $hash), 'users');
+            if (!$user) {
+                $this->jsonResponse(array('success' => '11', 'message' => 'User not found'));
+            }
+
+            $appointmentId = Model::create(
+                $this->dbConnection,
+                array(
+                    'product_id' => $productId,
+                    'user_id' => $user['id'],
+                    'created_at' => gmdate('Y-m-d\ H:i:s')
+                ),
+                'appointments'
+            );
+
+            if ($appointmentId) {
+                $this->jsonResponse(array('success' => '00', 'message' => 'Appointment booked successfully'));
+            }
+
+            $this->jsonResponse(array('success' => '11', 'message' => 'Server error', 'data' => array()));
         }
     }
 ?>
