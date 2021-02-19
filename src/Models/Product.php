@@ -13,7 +13,7 @@
 
         public static function getComments($dbConnection, $productId) {
             try {
-                $sql = 'SELECT comments.comment, comments.rate, users.name FROM comments INNER JOIN users ON comments.user_id=users.id WHERE products.id=' . $productId;
+                $sql = 'SELECT comments.comment, comments.rate, users.name FROM comments INNER JOIN users ON comments.user_id=users.id WHERE comments.id=' . $productId;
                 return $dbConnection->pdo->query($sql)->fetchAll();
             } catch(Exception $e) {
                 return false;
