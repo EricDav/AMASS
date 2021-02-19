@@ -54,7 +54,7 @@
                 if ($env == 'development') {
                     $baseUrl = 'http://localhost:8888/amass/src/Public/images/';
                 } else if ($env == 'staging') {
-                    $baseUrl = 'http://staging-api.amass.ng/amass/src/Public/images/';
+                    $baseUrl = 'http://staging-api.amass.ng/src/Public/images/';
                 } else {
                     $baseUrl = 'http://api.amass.ng/amass/src/Public/images/';
                 }
