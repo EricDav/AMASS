@@ -26,6 +26,10 @@
 
             $uploadOk = true;
             $imageFileType = pathinfo($_FILES['file']['name'],PATHINFO_EXTENSION);
+            $imageFileType2 = pathinfo($_FILES['file2']['name'],PATHINFO_EXTENSION);
+            $imageFileType3 = pathinfo($_FILES['file3']['name'],PATHINFO_EXTENSION);
+            $imageFileType4 = pathinfo($_FILES['file4']['name'],PATHINFO_EXTENSION);
+            
             $valid_extensions = array("jpg","jpeg","png");
             if( !in_array(strtolower($imageFileType),$valid_extensions) ) {
                 $uploadOk = false;
