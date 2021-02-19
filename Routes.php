@@ -10,7 +10,7 @@ class AMASS {
             BASE_URL . '/verify' => 'User@initiate',
             BASE_URL . '/products' => 'Product@create',
             BASE_URL . '/comments' => 'Product@addComment',
-            BASE_URL . '/appointments' => 'Product@bookAppointment',
+            BASE_URL . '/appointments' => 'User@bookAppointment',
         ),
 
         'GET' => array(
