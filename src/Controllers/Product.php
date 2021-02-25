@@ -10,6 +10,7 @@
 
     class Product extends Controller {
         const EXP_IN_SEC = 18000;
+        const DEFAULT_LIMIT = 5;
         public function __construct() {
             parent::__construct();
         }
@@ -22,13 +23,18 @@
             $categoryId = $request->body->category_id;
             $price  = $request->body->price;
             $tokenPayload = JWT::verifyToken($request->body->token);
+            if (!$tokenPayload->success) {
+                $this->jsonResponse(array('success' => false, 'message' => 'Authentication failed'));
+                // TODO
+                // verify token MIGHT TAKE THIS TO A SEPERATE MIDDLEWARE
+            }
             $tokenPayload = json_decode($tokenPayload->payload);
 
             $uploadOk = true;
             $imageFileType = pathinfo($_FILES['file']['name'],PATHINFO_EXTENSION);
-            $imageFileType2 = pathinfo($_FILES['file2']['name'],PATHINFO_EXTENSION);
-            $imageFileType3 = pathinfo($_FILES['file3']['name'],PATHINFO_EXTENSION);
-            $imageFileType4 = pathinfo($_FILES['file4']['name'],PATHINFO_EXTENSION);
+            // $imageFileType2 = pathinfo($_FILES['file2']['name'],PATHINFO_EXTENSION);
+            // $imageFileType3 = pathinfo($_FILES['file3']['name'],PATHINFO_EXTENSION);
+            // $imageFileType4 = pathinfo($_FILES['file4']['name'],PATHINFO_EXTENSION);
             
             $valid_extensions = array("jpg","jpeg","png");
             if( !in_array(strtolower($imageFileType),$valid_extensions) ) {
@@ -75,12 +81,29 @@
 
         public function get($req) {
             $pagNumber = $req->query->page_num;
-            $limit = $req->query->limit;
+            $limit = self::DEFAULT_LIMIT;
             $offset = ($pagNumber - 1)*$limit;
+            $env = Enviroment::getEnv();
+            $this->dbConnection->open();
+
+            $count = ProductModel::getCounts($this->dbConnection)['count'];
+            $add = $count%$limit == 0 ? 0 : 1;
+            $pageOffset = ((int) $count/$limit) + $add;
+            if ($pageOffset == $offset) {
+                $pagNumber = 0;
+            }
+            
+            if ($env == 'development') {
+                $baseUrl = 'http://localhost:8888/v1/products?page_num='.((int)$pagNumber+1);
+            } else if ($env == 'staging') {
+                $baseUrl = 'http://staging-api.amass.ng/v1/products?page_num='.((int)$pagNumber+1);
+            } else {
+                $baseUrl = 'http://api.amass.ng/amass/v1/products?page_num='.((int)$pagNumber+1);
+            }
 
             $this->dbConnection->open();
             $products = Model::find($this->dbConnection, array(), 'products', $offset, $limit);
-            $this->jsonResponse(array('success' => '00', 'messages' => 'Product retrieved successfully', 'data' => $products));
+            $this->jsonResponse(array('success' => '00', 'messages' => 'Product retrieved successfully', 'data' => $products, 'next_page' => $baseUrl));
         }
 
         public function getProduct($request) {

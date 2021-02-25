@@ -19,6 +19,15 @@
                 return false;
             }
         }
+
+        public static function getCounts($dbConnection) {
+            try {
+                $sql = 'SELECT COUNT(*) AS count FROM products';
+                return $dbConnection->pdo->query($sql)->fetch();
+            } catch(Exception $e) {
+                return false;
+            }
+        }
     }
 
 

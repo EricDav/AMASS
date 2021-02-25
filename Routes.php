@@ -26,12 +26,12 @@ class AMASS {
             BASE_URL . '/users' => ['email', 'phone_number', 'password', 'token'],
             BASE_URL . '/login' => ['password', 'username'],
             BASE_URL . '/verify' => ['email', 'phone_number', 'name'],
-            BASE_URL . '/products' => ['token', 'name', 'description', 'category_id', 'price'],
+            BASE_URL . '/products' => ['token', 'name', 'description', 'category_id', 'price', 'file'],
             BASE_URL . '/comments' => ['product_id', 'comment', 'rate', 'hash'],
             BASE_URL . '/appointments' => ['product_id', 'hash']
         ),
         'GET' => array(
-            BASE_URL . '/products' => ['limit', 'page_num'],
+            BASE_URL . '/products' => ['page_num'],
             BASE_URL . '/comments' => ['product_id'],
             BASE_URL . '/s/products' => ['product_id'],
             BASE_URL . '/s/users' => ['user_id']
