@@ -87,9 +87,8 @@
             $this->dbConnection->open();
 
             $count = ProductModel::getCounts($this->dbConnection)['count'];
-            $add = $count%$limit == 0 ? 0 : 1;
-            $pageOffset = ((int) $count/$limit) + $add;
-            if ($pageOffset == $offset) {
+            //var_dump($count); exit;
+            if ($pagNumber*$limit >= $count) {
                 $pagNumber = 0;
             }
             
@@ -103,7 +102,7 @@
 
             $this->dbConnection->open();
             $products = Model::find($this->dbConnection, array(), 'products', $offset, $limit);
-            $this->jsonResponse(array('success' => '00', 'messages' => 'Product retrieved successfully', 'data' => $products, 'next_page' => $baseUrl));
+            $this->jsonResponse(array('success' => '00', 'messages' => 'Product retrieved successfully', 'data' => $products, 'next_page' => $pagNumber+1, 'next_page_url' => $baseUrl));
         }
 
         public function getProduct($request) {

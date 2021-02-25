@@ -122,15 +122,13 @@
 
         public static function __find($dbConnection, $params, $tableName, $callee, $offset, $limit, $order, $orderBy) {
             try {
-
                 if (!is_array($params)) {
                     throw new \Exception('Invalid paramters parameter should be an array');
                 }
                 // Generate where clause
 
-                $whereClause = self::generateWhereClause($tableName, $params, $offset, $limit, $order, $orderBy);                
-                $sql = 'SELECT * FROM ' . $tableName . (!$params ? '' : ' WHERE' . $whereClause['clause']);
-
+                $whereClause = self::generateWhereClause($tableName, $params, $offset, $limit, $order, $orderBy);
+                $sql = 'SELECT * FROM ' . $tableName . ((!$params && !$limit)  ? '' : ($params ? ' WHERE' : '') . $whereClause['clause']);
                 $stmt= $dbConnection->pdo->prepare($sql);
                 $stmt->execute($whereClause['params']);
                 
