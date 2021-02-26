@@ -137,6 +137,7 @@
         }
 
         public function addComment($request) {
+            // echo 'fuck you'; exit;
             $productId = $request->body->product_id;
             $comment = $request->body->comment;
             $rate = $request->body->rate;
