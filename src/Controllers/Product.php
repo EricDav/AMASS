@@ -168,8 +168,9 @@
                 'comments'
             );
 
+            $comments = ProductModel::getComments($this->dbConnection, $productId);
             if ($commentId) {
-                $this->jsonResponse(array('success' => '00', 'message' => 'Comment added successfully'));
+                $this->jsonResponse(array('success' => '00', 'message' => 'Comment added successfully', 'comments' => $comments));
             }
 
             $this->jsonResponse(array('success' => '11', 'message' => 'Server error', 'data' => array()));
