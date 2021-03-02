@@ -174,14 +174,14 @@
 
         public function get($req) {
             $this->dbConnection->open();
-            $tokenPayload = JWT::verifyToken($req->query->token);
+            $tokenPayload = JWT::verifyToken($req->body->token);
             if (!$tokenPayload->success) {
                 $this->jsonResponse(array('success' => false, 'message' => 'Authentication failed'), 401);
                 // TODO
                 // verify token MIGHT TAKE THIS TO A SEPERATE MIDDLEWARE
             }
             $tokenPayload = json_decode($tokenPayload->payload);
-            $users = UserModel::find($this->dbConnection, array('role' => $req->query->role));
+            $users = UserModel::find($this->dbConnection, array('role' => $req->body->role));
             if (is_array($users)) {
                 $this->jsonResponse(array('success' => true, 'data' => $users), 200);
             }
@@ -287,7 +287,7 @@
         }
 
         public function getUser($request) {
-            $userId = $request->query->user_id;
+            $userId = $request->body->user_id;
             if (!is_numeric($userId)) {
                 $this->jsonResponse(array('success' => '11', 'message' => 'user id must be numeric'));
             }

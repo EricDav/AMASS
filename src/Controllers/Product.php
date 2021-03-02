@@ -80,7 +80,7 @@
         }
 
         public function get($req) {
-            $pagNumber = $req->query->page_num;
+            $pagNumber = $req->body->page_num;
             $limit = self::DEFAULT_LIMIT;
             $offset = ($pagNumber - 1)*$limit;
             $env = Enviroment::getEnv();
@@ -106,7 +106,7 @@
         }
 
         public function getProduct($request) {
-            $productId = $request->query->product_id;
+            $productId = $request->body->product_id;
             if (!is_numeric($productId)) {
                 $this->jsonResponse(array('success' => '11', 'message' => 'user id must be numeric'));
             }
@@ -123,7 +123,7 @@
         }
 
         public function getComments($request) {
-            $productId = $request->query->product_id;
+            $productId = $request->body->product_id;
             if (!is_numeric($productId)) {
                 $this->jsonResponse(array('success' => '11', 'message' => 'user id must be numeric'));
             }
